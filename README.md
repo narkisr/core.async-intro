@@ -1,6 +1,6 @@
 # Intro
 
-A core.async intro talk for [codemotion](http://telaviv.codemotionworld.com/) codemotion TA 2014
+A core.async intro talk for [codemotion](http://telaviv.codemotionworld.com/) TA 2014
 
 # License
 
