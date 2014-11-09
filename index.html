@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8">
+
+    <title> core.async, Clojure take on async programming </title>
+
+    <meta name="description" content="An introduction to Clojure core.async">
+    <meta name="author" content="narkisr">
+
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+    <link rel="stylesheet" href="css/reveal.min.css">
+    <link rel="stylesheet" href="css/theme/default.css" id="theme">
+
+    <!-- For syntax highlighting -->
+    <link rel="stylesheet" href="lib/css/zenburn.css">
+
+    <!-- If the query includes 'print-pdf', include the PDF print sheet -->
+    <script>
+	if( window.location.search.match( /print-pdf/gi ) ) {
+	  var link = document.createElement( 'link' );
+	  link.rel = 'stylesheet';
+	  link.type = 'text/css';
+	  link.href = 'css/print/pdf.css';
+	  document.getElementsByTagName( 'head' )[0].appendChild( link );
+	}
+    </script>
+  </head>
+
+  <body>
+
+    <div class="reveal">
+
+	<div class="slides">
+
+	  <section id="themes">
+	    <h2> Select a theme</h2>
+	    <small> 
+		<a href="?#/themes">Default</a> -
+		<a href="?theme=sky#/themes">Sky</a> -
+		<a href="?theme=beige#/themes">Beige</a> -
+		<a href="?theme=simple#/themes">Simple</a> -
+		<a href="?theme=serif#/themes">Serif</a> -
+		<a href="?theme=night#/themes">Night</a> <br>
+		<a href="?theme=moon#/themes">Moon</a> -
+		<a href="?theme=solarized#/themes">Solarized</a>
+	    </small>
+	  </section>
+
+	  <section>
+	    <h1>core.async</h1>
+	    <h3>Clojure take on async programming  </h3>
+	    <p>
+		Created by <a href="http://narkisr.com">narkisr</a> / <a href="http://twitter.com/narkisr">@narkisr</a>
+		</br>
+
+	    </p>
+	  </section>
+
+	  <section>
+	    <ul>
+		<li>Clojure intro</li>
+		<li>Why async?</li>
+		<li>core.async basics</li>
+		<li>High order channels</li>
+		<li>channels on the client side</li>
+	    </ul>
+	  </section>
+
+	  <section>
+	    <h2>Clojure</h2>
+	    <ul>
+		<li>LISP dialect</li>
+		<li>Concurrency tamed</li>
+		<li>Meta programmable</li>
+	    </ul>
+	  </section>
+
+	  <section>
+	    <h2> Hello </h2>
+	    <pre>
+	    <code data-trim contenteditable style="font-size: 18px; margin-top: 20px;">
+(defn -main []
+  (println "hello world"))
+	   </code>
+	    </pre>
+	  </section>
+
+	  <section>
+	    <h2> Basics</h2>
+	    <pre>
+	    <code data-trim contenteditable style="font-size: 18px; margin-top: 20px;">
+; prefix notation
+(+ 1 1)
+; define a value
+(def a 2)
+	   </code>
+	    </pre>
+	  </section>
+
+	  <section> 
+	    <h2> Why async?</h2>
+	    <ul>
+		<li>Better use of threads</li>
+		<li>We have to (JS)</li>
+		<li>Coordination</li>
+	    </ul>
+	  </section>
+
+	  <section> 
+	    <h2>core.async</h2>
+	    <ul>
+		<li> Hoare's CSP </li>
+		<li> Same model used in Go </li>
+		<li> Just a library</li>
+		<li> Targets JVM/JS </li>
+	    </ul>
+	  </section>
+
+	  <section>
+	    <h2> Basics </h2>
+	    <pre>
+	    <code data-trim contenteditable style="font-size: 18px; margin-top: 20px;">
+; unbuffered channel acts as a rendezvous 
+(def c (chan))
+
+; nil since its empty
+(take! c (fn [v] (println v))
+
+; trigger the print 
+(put! c "hello world")
+
+; removes empty on full
+(def d (dropping-buffer))
+	   </code>
+	    </pre>
+	  </section>
+
+	  <section> 
+	    <h2> </h2>
+	  </section>
+	  <section> 
+	    <h2> Buffered channels</h2>
+	    <pre>
+	    <code data-trim contenteditable style="font-size: 18px; margin-top: 20px;">
+; a channel with 3 spots
+(def c (chan 3))
+
+; removes empty on full
+(def d (dropping-buffer 3))
+
+; 
+	   </code>
+	    </pre>
+	  </section>
+	  <section> 
+	    <h2> Go macro </h2>
+	    <ul>
+		<li>Turns code to a state machine</li>
+		<li>Inspects channel operations</li>
+		<li>Parks blocking operations</li>
+		<li>Un-Parks when </li>
+	    </ul>
+	  </section>
+	</div>
+
+    </div>
+
+    <script src="lib/js/head.min.js"></script>
+    <script src="js/reveal.min.js"></script>
+
+    <script>
+
+	// Full list of configuration options available here:
+	// https://github.com/hakimel/reveal.js#configuration
+    Reveal.initialize({
+controls: true,
+progress: true,
+history: true,
+center: true,
+
+theme: Reveal.getQueryHash().theme, // available themes are in /css/theme
+transition: Reveal.getQueryHash().transition || 'default', // default/cube/page/concave/zoom/linear/fade/none
+
+// Parallax scrolling
+// parallaxBackgroundImage: 'https://s3.amazonaws.com/hakim-static/reveal-js/reveal-parallax-1.jpg',
+// parallaxBackgroundSize: '2100px 900px',
+
+// Optional libraries used to extend on reveal.js
+dependencies: [
+{ src: 'lib/js/classList.js', condition: function() { return !document.body.classList; } },
+{ src: 'plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+{ src: 'plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+{ src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+{ src: 'plugin/zoom-js/zoom.js', async: true, condition: function() { return !!document.body.classList; } },
+{ src: 'plugin/notes/notes.js', async: true, condition: function() { return !!document.body.classList; } }
+    ]
+    });
+
+    </script>
+
+  </body>
+</html>
