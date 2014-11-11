@@ -123,41 +123,47 @@
 	  </section>
 
 	  <section>
-	    <h2> Basics </h2>
+	    <h2> Callbacks </h2>
 	    <pre>
 	    <code data-trim contenteditable style="font-size: 18px; margin-top: 20px;">
 ; unbuffered channel acts as a rendezvous 
 (def c (chan))
 
 ; nil since its empty
-(take! c (fn [v] (println v))
+(take! c (fn [v] (println v)))
 
 ; trigger the print 
-(put! c "hello world")
+(put! c "hello world" (println "Data delivered!"))
 
-; removes empty on full
-(def d (dropping-buffer))
 	   </code>
 	    </pre>
 	  </section>
 
-	  <section> 
-	    <h2> </h2>
-	  </section>
-	  <section> 
-	    <h2> Buffered channels</h2>
+	  <section>
+	    <h2> Promises </h2>
 	    <pre>
 	    <code data-trim contenteditable style="font-size: 18px; margin-top: 20px;">
-; a channel with 3 spots
-(def c (chan 3))
 
-; removes empty on full
-(def d (dropping-buffer 3))
+(def c (chan))
 
-; 
-	   </code>
+;!!&lt; means: &lt;writes into, !! blocks and not transaction safe
+(future (println "done" (&lt;!! c 42)))
+
+; futures returns a promise
+(future (println "Got!" (&gt;!! c)))
+
+; same as future but returns a channel
+(thread (println "It works!" (&lt!! (thread 42))))
+         </code>
 	    </pre>
 	  </section>
+
+
+	  <section>
+	    <h3> But! </h3>
+	      <p> A thread is still required </p>
+	  </section>
+
 	  <section> 
 	    <h2> Go macro </h2>
 	    <ul>
