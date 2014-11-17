@@ -167,14 +167,128 @@
 	  <section> 
 	    <h2> Go macro </h2>
 	    <ul>
+		<li>A logical thread</li>
 		<li>Turns code to a state machine</li>
 		<li>Inspects channel operations</li>
 		<li>Parks blocking operations</li>
-		<li>Un-Parks when </li>
+		<li>Un-Parks when ready to run</li>
 	    </ul>
 	  </section>
-	</div>
 
+	  <section>
+	    <h2> Go </h2>
+	    <pre>
+	    <code data-trim contenteditable style="font-size: 18px; margin-top: 20px;">
+(go 42)
+
+(&lt!! (go 42))
+
+; notice the use if &lt!
+(&lt!! (go (println "It works!" (&lt! (go 42)))))
+         </code>
+	    </pre>
+	  </section>
+
+	  <section>
+	    <h2> Park vs Block</h2>
+	    <ul>
+	      <li> &lt!! &gt!! block a thread from a fixed thread pool</li>
+		<li> &lt! &gt! multiplexes thread logically across blocking calls</li>
+	    </ul>
+	  </section>
+
+	  <section> 
+	    <h2> Buffered channels </h2>
+	    <ul>
+	      <li>Back pressure mechanism</li>
+		<li>Producer/Consumer sync</li>
+	    </ul>
+	  </section>
+
+	  <section> 
+	    <h2> Buffered Cont..</h2>
+	    <pre> <code data-trim contenteditable style="font-size: 18px; margin-top: 20px;">
+(def fbc (chan 1)) 
+
+(go (&gt! fbc 1)
+    (println "done"))
+
+(go (&gt! fbc 2)
+    (println "done")) 
+
+(&lt!! fbc)
+(&lt!! fbc) 
+	    </code>
+	    </pre>
+	  </section>
+
+	  <section> 
+	    <h2> Dropping buffers</h2>
+	    <ul>
+	      <li>Don't block</li>
+		<li>Discard messages</li>
+	    </ul>
+	  </section>
+
+
+	  <section> 
+	    <h2> Dropping buffer</h2>
+	    <pre> <code data-trim contenteditable style="font-size: 18px; margin-top: 20px;">
+; sliding-buffer drops from start
+(def fbc (chan (dropping-buffer 1)))
+
+(go (&gt! fbc 1)
+    (println "done"))
+
+(go (&gt! fbc 2)
+    (println "done")) 
+
+; we will get only 1 (2 was thrown away)
+(&lt!! fbc)
+	    </code>
+	    </pre>
+	  </section>
+
+	  <section>
+	    <h2> Closing </h2>
+	    <pre> <code data-trim contenteditable style="font-size: 18px; margin-top: 20px;">
+(def c (chan))
+
+(close! c)
+    
+; we get back nil
+(&lt!! c)
+	    </code>
+	    </pre>
+	  </section>
+
+	  <section>
+	    <h2> Multiplexing </h2>
+	    <pre> <code data-trim contenteditable style="font-size: 18px; margin-top: 20px;">
+(def a (chan))
+(def b (chan))
+
+(put! a 42)                    
+
+; will return [42 channel-with-response]
+(alts!! [a b])  
+	    </code> </pre>
+	  </section>
+
+	  <section>
+	    <h3> Timeout </h3>
+	    <pre> <code data-trim contenteditable style="font-size: 18px; margin-top: 20px;">
+(def a (chan))
+(def b (chan))
+
+(&lt!! (timeout 1000))
+  
+(alts!! [a (timeout 1000)]) 
+	    </code> </pre>
+	  </section>
+
+
+	</div>
     </div>
 
     <script src="lib/js/head.min.js"></script>

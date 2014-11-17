@@ -1,6 +1,6 @@
 (ns examples.promises
   (:require
-    [clojure.core.async :refer (<!! >!! <! >! chan thread)]))
+    [clojure.core.async :refer (<!! >!! chan thread)]))
 
 (def c (chan))
 
