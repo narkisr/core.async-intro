@@ -82,25 +82,46 @@
 	  </section>
 
 	  <section>
-	    <h2> Hello </h2>
-	    <pre>
-	    <code data-trim contenteditable style="font-size: 18px; margin-top: 20px;">
-(defn -main []
-  (println "hello world"))
-	   </code>
-	    </pre>
-	  </section>
-
-	  <section>
-	    <h2> Basics</h2>
-	    <pre>
-	    <code data-trim contenteditable style="font-size: 18px; margin-top: 20px;">
+	    <h2> Calling </h2>
+	    <pre> <code data-trim contenteditable style="font-size: 18px; margin-top: 20px;">
 ; prefix notation
 (+ 1 1)
+
+; call nesting
+(println (+ 1 2 ))
+
+; compare to js
+println(1 + 2);
+	   </code> </pre>
+	  </section>
+
+	  <section> 
+	    <h2> Literals </h2>
+	    <pre> <code data-trim contenteditable style="font-size: 18px; margin-top: 20px;">
+; vector
+[1 2 3]
+
+; list 
+'(1 2 3)
+
+; map
+{:a 1 :b 2}
+
+; set
+#{1 2}
+	    </code> </pre>
+	  
+	  </section>
+
+         <section>
+	    <h2> Defing </h2>
+	    <pre> <code data-trim contenteditable style="font-size: 18px; margin-top: 20px;">
 ; define a value
 (def a 2)
-	   </code>
-	    </pre>
+
+(defn -main []
+  (println "hello world"))
+	   </code> </pre>
 	  </section>
 
 	  <section> 
@@ -134,15 +155,12 @@
 
 ; trigger the print 
 (put! c "hello world" (println "Data delivered!"))
-
-	   </code>
-	    </pre>
+           </code> </pre>
 	  </section>
 
 	  <section>
 	    <h2> Promises </h2>
-	    <pre>
-	    <code data-trim contenteditable style="font-size: 18px; margin-top: 20px;">
+	    <pre> <code data-trim contenteditable style="font-size: 18px; margin-top: 20px;">
 
 (def c (chan))
 
@@ -154,8 +172,7 @@
 
 ; same as future but returns a channel
 (thread (println "It works!" (&lt!! (thread 42))))
-         </code>
-	    </pre>
+         </code> </pre>
 	  </section>
 
 
@@ -193,7 +210,7 @@
 	    <h2> Park vs Block</h2>
 	    <ul>
 	      <li> &lt!! &gt!! block a thread from a fixed thread pool</li>
-		<li> &lt! &gt! multiplexes thread logically across blocking calls</li>
+		<li> &lt! &gt! multiplexes a logical thread across blocking calls</li>
 	    </ul>
 	  </section>
 
@@ -272,21 +289,61 @@
 
 ; will return [42 channel-with-response]
 (alts!! [a b])  
+
+(alts!! [a :default :meh]) 
 	    </code> </pre>
 	  </section>
 
 	  <section>
 	    <h3> Timeout </h3>
 	    <pre> <code data-trim contenteditable style="font-size: 18px; margin-top: 20px;">
-(def a (chan))
-(def b (chan))
-
 (&lt!! (timeout 1000))
   
+; [nil timeout-channel] 
 (alts!! [a (timeout 1000)]) 
+
+; put into a -> [nil timeout-channel]
+(alts!! [[a 42] (timeout 1000)]) 
+
 	    </code> </pre>
 	  </section>
 
+	  <section>
+	    <h3> More alts</h3>
+	    <pre> <code data-trim contenteditable style="font-size: 18px; margin-top: 20px;">
+(put! a 1)
+(put! b 2)
+
+; order will be random (prevent starving
+(alts!! [a b]) 
+
+; we can have priority by ordering
+(alts!! [a b] :priority true) 
+	    </code> </pre>
+	  </section>
+
+
+	  <section> 
+          <h3> Mult and Tap</h3>
+	  
+	    <pre> <code data-trim contenteditable style="font-size: 18px; margin-top: 20px;">
+(def to-mult (chan 1))
+(def m (mult to-mult))
+
+(let [c (chan 1)]
+  (tap m c)
+  (go (loop []
+        (when-let [v (<! c)]
+          (println "Got! " v)
+          (recur))
+        (println "Exiting!"))))
+
+(>!! to-mult 42)
+(>!! to-mult 43)
+
+(close! to-mult)
+</code> </pre>
+	  </section>
 
 	</div>
     </div>
