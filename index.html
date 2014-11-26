@@ -85,13 +85,11 @@
 	    <h2> Calling </h2>
 	    <pre> <code data-trim contenteditable style="font-size: 18px; margin-top: 20px;">
 ; prefix notation
-(+ 1 1)
+(+ 1 1) -> 1 + 1 ;
 
 ; call nesting
-(println (+ 1 2 ))
+(println (+ 1 2 )) ->  println(1 + 2);
 
-; compare to js
-println(1 + 2);
 	   </code> </pre>
 	  </section>
 
@@ -333,17 +331,34 @@ println(1 + 2);
 (let [c (chan 1)]
   (tap m c)
   (go (loop []
-        (when-let [v (<! c)]
+        (when-let [v (&gt! c)]
           (println "Got! " v)
           (recur))
         (println "Exiting!"))))
 
-(>!! to-mult 42)
-(>!! to-mult 43)
+(&gt!! to-mult 42)
+(&gt!! to-mult 43)
 
 (close! to-mult)
 </code> </pre>
 	  </section>
+
+    <section>
+      <h3>Clojurescript</h3>
+      <ul>
+        <li>Clojure compiled to JS</li>
+        <li>Not full Clojure but pretty close</li>
+        <li>core.async supports it</li>
+	  <li>No thread just go blocks</li>
+      </ul>
+    </section>
+
+    <section>
+      <a href="./10,000 Processes.html">
+       <h3> 10k processes</h3>
+	</a>
+    </section>
+
 
 	</div>
     </div>
