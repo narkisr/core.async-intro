@@ -7,4 +7,4 @@
 
 (take! c (fn [v] (println v)))
 
-(put! c "hello world" (fn []  println "Data delivered!"))
+(put! c "hello world" (fn [v]  (println "Data delivered!")))
