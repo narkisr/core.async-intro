@@ -89,17 +89,22 @@
 ; call nesting
 (println (+ 1 2 )) ->  println(1 + 2);
 
+; interop
+(.length "abc")
 	   </code> </pre>
 	  </section>
 
 	  <section> 
-	    <h2> Literals </h2>
+	    <h2> Data structures</h2>
 	    <pre> <code data-trim contenteditable style="font-size: 18px; margin-top: 20px;">
 ; vector
 [1 2 3]
 
 ; list 
 '(1 2 3)
+
+; map 
+{1 2}
 	    </code> </pre>
 	  
 	  </section>
@@ -110,11 +115,12 @@
 ; define a value
 (def a 2)
 
-(defn -main []
-  (println "hello world"))
+(defn -main [name]
+  (println "hello " name))
 
-(let [a 1 b 2]
-  (println a b))
+(defn scope []
+  (let [a 1 b 2]
+    (println a b))) ; 1 2 
 
 	   </code> </pre>
 	  </section>
@@ -125,8 +131,13 @@
 (while true
   (println 1))
 
+(loop [i 0]
+ (if (> i 10)
+   (println "got to 10!")
+   (recur (inc i))))
+
 (if (= a 2) 
-   (println "its two"
+   (println "its two")
    (println "not two"))
 
 (when foo (println "im foo"))
@@ -146,7 +157,6 @@
 	  <section> 
 	    <h2>core.async</h2>
 	    <ul>
-		<li>Hoare's CSP </li>
 		<li>Same model used in Go </li>
 		<li>Just a library</li>
 		<li>Targets JVM/JS </li>
@@ -157,36 +167,41 @@
 	    <h2> Callbacks </h2>
 	    <pre>
 	    <code data-trim contenteditable style="font-size: 18px; margin-top: 20px;">
-; unbuffered channel acts as a rendezvous 
+; many to many channel
+; can serve many puts/takes
 (def c (chan))
 
 ; nil since its empty
 (take! c (fn [v] (println v)))
 
 ; triggers the print 
-(put! c "hello world" (println "Data delivered!"))
+(put! c "hello world")
            </code> </pre>
 	  </section>
 
 	  <section>
-	    <h2> Promises </h2>
+	    <h2> But we are in callback hell!</h2>
+	  </section>
+
+	  <section>
+	    <h2> Blocking put/take </h2>
 	    <pre> <code data-trim contenteditable style="font-size: 18px; margin-top: 20px;">
 (def c (chan))
 
 ;&lt;!! means: &lt; writes into, !! blocks and not transaction safe
-(future (println "done" (&lt;!! c 42)))
+(future (println "done" (&gt;!! c 42)))
 
-; futures returns a promise
-(future (println "Got!" (&gt;!! c)))
+; once delivered prints 42
+(future (println "Got!" (&lt;!! c)))
 
 ; same as future but returns a channel
-(thread (println "It works!" (&lt!! (thread 42))))
+(println "It works!" (&lt!! (thread 42)))
          </code> </pre>
 	  </section>
 
 	  <section>
 	    <h3> But! </h3>
-	      <p> A thread is still required </p>
+	    <h4> A thread is still required </h4>
 	  </section>
 
 	  <section> 
@@ -204,11 +219,12 @@
 	    <h2> Go </h2>
 	    <pre>
 	    <code data-trim contenteditable style="font-size: 18px; margin-top: 20px;">
+; returns a many to many channel
 (go 42)
 
 (&lt!! (go 42))
 
-; notice the use of &lt!!
+; notice the use of &lt! vs &lt!!
 (&lt!! (go (println "It works!" (&lt! (go 42)))))
          </code>
 	    </pre>
@@ -286,6 +302,7 @@
 	    </pre>
 	  </section>
 
+	  <section> <h3> Real world example</h3></section>
 	  <section> 
 	    <h2> Tinymasq </h2>
 	    <pre> <code data-trim contenteditable style="font-size: 18px; margin-top: 20px;">
@@ -346,7 +363,7 @@
 ; [nil timeout-channel] 
 (alts!! [a (timeout 1000)]) 
 
-; put into a -> [nil timeout-channel]
+; alt with a write no takers so [nil timeout-channel] 
 (alts!! [[a 42] (timeout 1000)]) 
 
 	    </code> </pre>
@@ -390,6 +407,23 @@
 	  </section>
 
     <section>
+      <h3>Pubsub</h3>
+	<pre> <code data-trim contenteditable style="font-size: 18px; margin-top: 20px;">
+(def to-pub (chan 1))
+(def p (pub to-pub :type))
+
+(let [c (chan 1)]
+  (sub p :error c)
+    (go 
+      (while true
+        (when-let [e (&lt! c)]
+   	   (println "got an error" e)))))
+
+(&gt!! to-pub {:type :error :msg "bad thing"})
+(close! to-pub)
+</code> </pre>
+    </section>
+    <section>
       <h3>Clojurescript</h3>
       <ul>
         <li>Clojure compiled to JS</li>
@@ -403,6 +437,16 @@
       <a href="./10,000 Processes.html">
        <h3> 10k processes</h3>
 	</a>
+       <pre> <code data-trim contenteditable style="font-size: 18px; margin-top: 20px;">
+(let [render (render-loop 40)]
+  (loop [i 0]
+    (when (< i (* width height))
+      (go 
+        (while true
+          (&lt! (timeout (+ 1000 (rand-int 10000))))
+          (&gt! render [(rand-int 10000) (rand-int 10)])))
+      (recur (inc i)))))
+      </code> </pre>
     </section>
 
     <section>
