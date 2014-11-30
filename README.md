@@ -1,6 +1,6 @@
 # Intro
 
-A core.async intro talk for [codemotion](http://telaviv.codemotionworld.com/) TA 2014
+A core.async intro talk for [codemotion](http://telaviv.codemotionworld.com/) TA 2014, it can be viewed [here](http://narkisr.github.io/core.async-intro/#/themes).
 
 # License
 
