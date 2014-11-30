@@ -1,4 +1,4 @@
-(ns examples.promises
+(ns examples.blocking
   (:require
     [clojure.core.async :refer (<!! >!! chan thread)]))
 
@@ -8,6 +8,6 @@
 
 (future (println "Got!" (<!! c)))
 
-(thread (println "It works!" (<!! (thread 42))))
+(println "It works!" (<!! (thread 42)))
 
 
