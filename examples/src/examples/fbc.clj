@@ -4,7 +4,6 @@
 
 (def fbc (chan 1))
 
-
 (go (>! fbc 1)
     (println "done"))
 
