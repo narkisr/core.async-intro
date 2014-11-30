@@ -131,16 +131,18 @@
 (while true
   (println 1))
 
-(loop [i 0]
- (if (> i 10)
-   (println "got to 10!")
-   (recur (inc i))))
-
 (if (= a 2) 
    (println "its two")
    (println "not two"))
 
 (when foo (println "im foo"))
+
+(loop [i 0]
+ (if (= i 10)
+   (println "got to 10!")
+   (recur (inc i))))
+
+
 
 	    </code> </pre>
 	  </section>
@@ -324,21 +326,28 @@
 (defn process-loop []
   (go 
     (while true
-      (let [pkt (&lt! lookups) message (Message. (.getData pkt)) 
-            record (.getQuestion message) host (.toString (.getName record) false)
+      (let [pkt (&lt! lookups) 
+            message (Message. (.getData pkt)) 
+            record (.getQuestion message) 
+            host (.toString (.getName record) false)
             ip (get-host (normalized-host host))]
         (when ip
           (.addRecord message (record-of host (into-bytes ip)) Section/ANSWER))
         (.setData pkt (.toWire message))
-        (&gt! answers [pkt host ip])))))
+        (&gt! answers pkt)))))
 
+       </code> </pre>
+	  </section>
+	  <section> 
+	    <h2> Reply</h2>
+	    <pre> <code data-trim contenteditable style="font-size: 18px; margin-top: 20px;">
 (defn reply-loop []
   (go
     (while true
-      (let [[pkt host ip] (&lt! answers)] 
-        (.send @udp-server pkt)))))
-	    </code> </pre>
-	  </section>
+     (let [pkt (&lt! answers)] 
+       (.send @udp-server pkt))))) 
+          </code> </pre>
+       </section>
 
 	  <section>
 	    <h2> Multiplexing </h2>
@@ -395,7 +404,7 @@
     (tap m c)
     (go 
       (while true
-         (when-let [v (&gt! c)]
+         (when-let [v (&lt! c)]
            (println "Got! " v)
          (println "Exiting!"))))))
 
@@ -443,7 +452,9 @@
     (when (< i (* width height))
       (go 
         (while true
+          ; sleeping for a random time
           (&lt! (timeout (+ 1000 (rand-int 10000))))
+          ; passing position and color 
           (&gt! render [(rand-int 10000) (rand-int 10)])))
       (recur (inc i)))))
       </code> </pre>
